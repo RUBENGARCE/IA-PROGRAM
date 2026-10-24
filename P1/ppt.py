@@ -5,14 +5,14 @@ UT01 - Introducción a la programación de Inteligencia Artificial
 """
 import random
 # 1. Constantes
-ROCK = "piedra"
-PAPER = "papel"
-SCISSORS = "tijera"
+piedra = "piedra"
+papel = "papel"
+tijeras = "tijera"
 OPCIONES = {
 # Tarea PIA01 · Piedra, Papel o Tijera · Página 1
-    "1": ROCK,
-    "2": PAPER,
-    "3": SCISSORS,
+    "1": piedra,
+    "2": papel,
+    "3": tijeras,
 }
 def decidir_ganador(user_action, computer_action):
     """Compara las dos jugadas e imprime el resultado de la ronda.
@@ -20,22 +20,22 @@ def decidir_ganador(user_action, computer_action):
     if user_action == computer_action:
         print(f"Ambos habéis elegido {user_action}. ¡Empate!")
         return "empate"
-    if user_action == ROCK:
-        if computer_action == SCISSORS:
+    if user_action == piedra:
+        if computer_action == tijeras:
             print("La piedra rompe la tijera. ¡Ganaste!")
             return "usuario"
         else:
             print("El papel envuelve la piedra. Perdiste.")
             return "ordenador"
-    elif user_action == PAPER:
-        if computer_action == ROCK:
+    elif user_action == papel:
+        if computer_action == piedra:
             print("El papel envuelve la piedra. ¡Ganaste!")
             return "usuario"
         else:
             print("La tijera corta el papel. Perdiste.")
             return "ordenador"
-    elif user_action == SCISSORS:
-        if computer_action == PAPER:
+    elif user_action == tijeras:
+        if computer_action == papel:
             print("La tijera corta el papel. ¡Ganaste!")
             return "usuario"
         else:
@@ -55,7 +55,7 @@ def main():
     try:
         while True:
             user_action = pedir_jugada()
-            computer_action = random.choice([ROCK, PAPER, SCISSORS])
+            computer_action = random.choice([piedra, papel, tijeras])
             print(f"Tú: {user_action} | Ordenador: {computer_action}")
             resultado = decidir_ganador(user_action, computer_action)
             if resultado == "usuario":
