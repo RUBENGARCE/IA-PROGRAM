@@ -50,7 +50,7 @@ def pedir_jugada():
         print("Opción no válida. Introduce 1, 2 o 3.")
 def main():
     print("=== PIEDRA, PAPEL O TIJERA ===")
-    print("(Pulsa Ctrl + C para salir)")
+    print("(Pulsa Ctrl + C para salir)")1
     victorias = derrotas = empates = 0
     try:
         while True:
@@ -68,4 +68,5 @@ def main():
         print("\n\n--- Fin de la partida ---")
         print(f"Victorias: {victorias} | Derrotas: {derrotas} | Empates: {empates}")
 # Punto de entrada
-if __name__ 
+if __name__ == "__main__":
+    main()
