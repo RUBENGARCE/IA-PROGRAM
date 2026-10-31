@@ -1,0 +1,524 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Chuleta de Git</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: columna de lectura con índice lateral fijo en escritorio; los comandos son la pieza principal y llevan copiar. */
+:root {
+  --bg: #F4F6F7;
+  --surface: #FFFFFF;
+  --ink: #16202A;
+  --muted: #55636F;
+  --line: #DAE1E6;
+  --accent: #0A6B66;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #DCEFED;
+  --code-bg: #EAEFF2;
+  --warn: #8F4A06;
+  --warn-soft: #FBEAD2;
+  --danger: #A3302A;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", Consolas, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E151B;
+    --surface: #151E26;
+    --ink: #E5ECF1;
+    --muted: #94A2AE;
+    --line: #25323D;
+    --accent: #4CC3B8;
+    --accent-ink: #06201D;
+    --accent-soft: #123430;
+    --code-bg: #1B2731;
+    --warn: #E8A95B;
+    --warn-soft: #3B2A13;
+    --danger: #F09189;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E151B;
+  --surface: #151E26;
+  --ink: #E5ECF1;
+  --muted: #94A2AE;
+  --line: #25323D;
+  --accent: #4CC3B8;
+  --accent-ink: #06201D;
+  --accent-soft: #123430;
+  --code-bg: #1B2731;
+  --warn: #E8A95B;
+  --warn-soft: #3B2A13;
+  --danger: #F09189;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 56px;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--bg);
+  z-index: 10;
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+.wrap { max-width: 1080px; margin: 0 auto; }
+
+/* Cabecera */
+.hero { padding-block: 40px 20px; }
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.1rem, 6vw, 3.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+  text-wrap: balance;
+}
+.hero p { margin: 0; color: var(--muted); max-width: 62ch; }
+.hero .count { margin-top: 12px; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+
+/* Buscador fijo */
+.bar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  background: var(--bg);
+  padding-block: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.search { position: relative; max-width: 560px; }
+.search input {
+  width: 100%;
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.search input::placeholder { color: var(--muted); }
+.search input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Estructura */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; margin-top: 20px; }
+.nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+.nav a {
+  flex: none;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 13.5px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  white-space: nowrap;
+}
+.nav a:hover { border-color: var(--accent); }
+.nav a[aria-current="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 900px) {
+  .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 40px; }
+  .nav {
+    flex-direction: column;
+    gap: 2px;
+    overflow: visible;
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + 74px);
+    align-self: start;
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+    padding-bottom: 0;
+  }
+  .nav a { border: 0; border-radius: 6px; background: transparent; padding: 6px 10px; white-space: normal; }
+  .nav a[aria-current="true"] { background: var(--accent-soft); color: var(--ink); font-weight: 600; }
+}
+
+main { min-width: 0; }
+section { margin-bottom: 44px; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 70px); }
+h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.45rem;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  text-wrap: balance;
+}
+h2 .num { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500; color: var(--muted); }
+.chip {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+.chip.warn { color: var(--warn); background: var(--warn-soft); }
+
+/* Flujo diario */
+.flow { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.step {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.step .n { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.step .what { color: var(--muted); font-size: 14px; }
+.step .cmd { flex-direction: column; align-items: flex-start; }
+.step .cmd code.c { align-self: stretch; flex: none; }
+@media (min-width: 700px) {
+  .step:not(:last-child)::after {
+    content: "→";
+    position: absolute;
+    right: -12px; top: 50%;
+    transform: translate(50%, -50%);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-weight: 500;
+    background: var(--bg);
+    padding: 0 2px;
+    z-index: 1;
+  }
+}
+@media (max-width: 899px) { .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .flow { grid-template-columns: minmax(0, 1fr); } }
+.callout {
+  margin-top: 14px;
+  background: var(--accent-soft);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+.callout code { font-family: var(--font-mono); font-size: 13px; }
+
+/* Conceptos */
+.terms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin: 12px 0 0; }
+.term { padding: 12px 0; border-top: 1px solid var(--line); min-width: 0; }
+.term dt { font-weight: 600; }
+.term dd { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+@media (max-width: 699px) { .terms { grid-template-columns: minmax(0, 1fr); } }
+
+/* Filas de comandos */
+.rows { margin-top: 10px; border-top: 1px solid var(--line); }
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 6px 24px;
+  align-items: start;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+@media (max-width: 699px) { .row { grid-template-columns: minmax(0, 1fr); } }
+.cmd { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
+code.c {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.5;
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: 6px 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+button.copy {
+  flex: none;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  min-width: 74px;
+}
+button.copy:hover { border-color: var(--accent); }
+button.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.copy.ok { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.desc { margin: 0; color: var(--muted); font-size: 14.5px; padding-top: 5px; }
+.desc .chip { margin-left: 6px; vertical-align: 1px; }
+
+.notes { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.notes p { margin: 0; font-size: 14px; color: var(--muted); max-width: 72ch; }
+.notes pre {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: 10px 12px;
+  overflow-x: auto;
+}
+
+/* Errores */
+.errs { margin-top: 10px; border-top: 1px solid var(--line); }
+.err { padding: 16px 0; border-bottom: 1px solid var(--line); display: grid; gap: 6px; min-width: 0; }
+.err .e { font-family: var(--font-mono); font-size: 13.5px; font-weight: 500; color: var(--danger); overflow-wrap: anywhere; }
+.err .why { margin: 0; color: var(--muted); font-size: 14.5px; }
+.err .fixes { display: grid; gap: 6px; margin-top: 4px; }
+.err .fixes .cmd { max-width: 640px; }
+.err .none { font-size: 14px; color: var(--accent); }
+.err .nota { margin: 2px 0 0; font-size: 13.5px; color: var(--warn); }
+
+.empty { padding: 28px 0; color: var(--muted); }
+[hidden] { display: none !important; }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <h1 id="t"></h1>
+    <p id="sub"></p>
+    <div class="count" id="count"></div>
+  </header>
+  <div class="bar">
+    <div class="search">
+      <input id="q" type="search" placeholder="Busca un comando o una palabra (push, deshacer, rama…)" autocomplete="off" aria-label="Buscar en la chuleta">
+    </div>
+  </div>
+  <div class="layout">
+    <nav class="nav" id="nav" aria-label="Categorías"></nav>
+    <main id="main"></main>
+  </div>
+</div>
+
+<script>
+const D = {"title": "Chuleta de Git y GitHub", "subtitle": "Apuntes unificados · IABD · Programación de Inteligencia Artificial · UT01", "flow": [["git status", "Mira qué ha cambiado"], ["git add -A", "Prepara todo"], ["git commit -m \"Qué he hecho\"", "Guarda la versión"], ["git push", "Súbela a GitHub"]], "flowNote": "Antes de empezar, escribe pwd y comprueba que estás en la carpeta del proyecto (no en tu carpeta personal).", "concepts": [["Repositorio", "Carpeta cuyo contenido controla Git, con el historial de todos los cambios."], ["Commit", "Foto del proyecto en un momento concreto: una versión guardada."], ["Staging", "Zona intermedia donde dejas lo que irá en el próximo commit (se llena con git add)."], ["Repositorio local y remoto", "El local está en tu ordenador. El remoto es la copia en GitHub, en Internet."], ["origin", "Nombre habitual del repositorio remoto. Podría llamarse de otra forma, pero casi siempre es origin."], ["main", "Rama principal. Según la configuración puede salir como master; git branch -M main la fija."], ["HEAD", "El commit en el que estás ahora. HEAD~1 es el anterior."], ["push y fetch", "push envía tus commits al remoto. fetch trae información del remoto sin mezclarla."], ["-u en el primer push", "Enlaza la rama local con la remota. Después basta con git push."]], "sections": [{"id": "config", "title": "Instalación y configuración", "tag": "Una sola vez", "rows": [{"c": "sudo apt update && sudo apt install git", "d": "Instala Git en Linux", "w": false}, {"c": "git --version", "d": "Comprueba que Git está instalado", "w": false}, {"c": "git config --global user.name \"Nombre Apellido\"", "d": "Guarda tu nombre para los commits", "w": false}, {"c": "git config --global user.email \"correo@ejemplo.com\"", "d": "Guarda tu correo para los commits", "w": false}, {"c": "git config --list", "d": "Muestra cómo estás registrado", "w": false}], "notes": []}, {"id": "crear", "title": "Crear o descargar un repositorio", "tag": "", "rows": [{"c": "git init", "d": "Le dice a Git: «controla esta carpeta». Hazlo dentro de la carpeta del proyecto", "w": false}, {"c": "git branch -M main", "d": "Renombra la rama actual a main (evita que se llame master)", "w": false}, {"c": "git clone https://github.com/USUARIO/REPO.git", "d": "Descarga un proyecto entero de GitHub", "w": false}], "notes": ["Comprueba con pwd que estás en la carpeta del proyecto antes de ejecutar git init."]}, {"id": "guardar", "title": "Preparar y guardar cambios", "tag": "", "rows": [{"c": "git add PPT.PY", "d": "Prepara un solo archivo para el próximo commit", "w": false}, {"c": "git add RETOS/", "d": "Prepara una carpeta entera", "w": false}, {"c": "git add .", "d": "Prepara todo lo de la carpeta actual", "w": false}, {"c": "git add -A", "d": "Prepara todo: nuevos, modificados, movidos y borrados", "w": false}, {"c": "git commit -m \"Mensaje\"", "d": "Guarda una versión con una descripción", "w": false}, {"c": "git commit --amend -m \"Mensaje nuevo\"", "d": "Corrige el último commit. Solo si todavía no has hecho push", "w": true}], "notes": ["Git no sube carpetas vacías: si quieres conservar una, pon un archivo dentro (por ejemplo .gitkeep)."]}, {"id": "github", "title": "Conectar con GitHub", "tag": "", "rows": [{"c": "git remote add origin https://github.com/USUARIO/REPO.git", "d": "Enlaza tu proyecto con GitHub", "w": false}, {"c": "git remote -v", "d": "Muestra a qué URL apunta origin (fetch y push)", "w": false}, {"c": "git remote set-url origin URL_NUEVA", "d": "Cambia la URL de origin", "w": false}, {"c": "git remote remove origin", "d": "Elimina el enlace con GitHub", "w": false}, {"c": "sudo apt install gh", "d": "Instala GitHub CLI", "w": false}, {"c": "gh --version", "d": "Comprueba que GitHub CLI está instalado", "w": false}, {"c": "gh auth login", "d": "Inicia sesión en GitHub desde la terminal", "w": false}, {"c": "gh auth status", "d": "Comprueba si estás conectado a GitHub", "w": false}], "notes": ["Mi repositorio: https://github.com/RUBENGARCE/IA-PROGRAM.git", "En gh auth login elige: GitHub.com → HTTPS → Y (autenticar Git) → Login with a web browser.", "GitHub te da un código tipo XXXX-XXXX: escríbelo en github.com/login/device.", "GitHub ya no acepta la contraseña de la cuenta en la terminal: usa gh auth login o un token."]}, {"id": "sync", "title": "Subir y bajar (sincronizar)", "tag": "", "rows": [{"c": "git push -u origin main", "d": "Primera subida: envía main y enlaza la rama local con la remota", "w": false}, {"c": "git push", "d": "Sube tus nuevos commits a GitHub", "w": false}, {"c": "git pull", "d": "Baja y mezcla los cambios de GitHub", "w": false}, {"c": "git pull origin main --allow-unrelated-histories", "d": "Mezcla cuando el repositorio de GitHub ya tenía contenido (por ejemplo un README)", "w": false}, {"c": "git fetch", "d": "Baja información de GitHub sin mezclarla", "w": false}], "notes": []}, {"id": "historial", "title": "Ver estado e historial", "tag": "", "rows": [{"c": "git status", "d": "Qué archivos han cambiado", "w": false}, {"c": "git log --oneline", "d": "Lista los commits, uno por línea, con su ID corto", "w": false}, {"c": "git log", "d": "Historial completo de commits", "w": false}, {"c": "git diff", "d": "Cambios todavía sin añadir", "w": false}, {"c": "git diff --staged", "d": "Cambios ya añadidos (preparados)", "w": false}, {"c": "git diff HEAD~1 HEAD", "d": "Muestra el último cambio", "w": false}, {"c": "git diff --stat HEAD~1 HEAD", "d": "Resumen de archivos cambiados", "w": false}, {"c": "git diff 9223912 HEAD", "d": "Compara una versión concreta con la actual (cambia el ID por el tuyo)", "w": false}, {"c": "git show ID:archivo.py", "d": "Consulta un archivo tal como estaba en una versión anterior", "w": false}, {"c": "git switch --detach ID", "d": "Mira el proyecto entero en una versión anterior", "w": false}, {"c": "git switch main", "d": "Vuelve a la versión actual de main", "w": false}], "notes": ["Para comparar versiones, primero mira los IDs con git log --oneline y copia el que te interese.", "En git log, «HEAD -> main» es tu versión actual y «origin/main» es lo último que hay en GitHub."]}, {"id": "ramas", "title": "Ramas", "tag": "", "rows": [{"c": "git branch", "d": "Lista las ramas y marca en cuál estás", "w": false}, {"c": "git branch nueva-rama", "d": "Crea una rama nueva", "w": false}, {"c": "git switch nueva-rama", "d": "Cambia a esa rama", "w": false}, {"c": "git switch -c nueva-rama", "d": "Crea la rama y cambia a ella a la vez", "w": false}, {"c": "git merge nueva-rama", "d": "Fusiona esa rama en la rama actual", "w": false}, {"c": "git branch -d nueva-rama", "d": "Borra una rama que ya está fusionada", "w": false}], "notes": ["¿Aparece master en vez de main? Mira con git branch y fíjala con git branch -M main."]}, {"id": "mover", "title": "Mover, renombrar y borrar archivos", "tag": "", "rows": [{"c": "git mv PPT.PY ppt.py", "d": "Renombra o mueve un archivo conservando su historial", "w": false}, {"c": "git rm archivo.py", "d": "Borra el archivo y registra el borrado", "w": true}, {"c": "git rm --cached archivo.py", "d": "Deja de seguir el archivo sin borrarlo del disco", "w": false}], "notes": ["En Windows, un cambio solo de mayúsculas a minúsculas puede pasar desapercibido: usa git mv."]}, {"id": "deshacer", "title": "Deshacer cambios", "tag": "", "rows": [{"c": "git restore archivo.py", "d": "Descarta los cambios sin guardar de un archivo. No se pueden recuperar", "w": true}, {"c": "git restore --staged archivo.py", "d": "Saca el archivo de lo preparado (sigue modificado)", "w": false}, {"c": "git revert ID", "d": "Crea un commit nuevo que deshace un commit antiguo", "w": false}, {"c": "git reset --soft HEAD~1", "d": "Deshace el último commit y conserva los cambios", "w": false}], "notes": ["No uses git reset --hard ni git push --force hasta saber bien qué hacen: pueden borrar trabajo."]}, {"id": "rebase", "title": "Cambiar el mensaje de un commit antiguo", "tag": "", "rows": [{"c": "git rebase -i ID_ANTERIOR", "d": "Abre la lista de commits posteriores al ID indicado para revisarlos", "w": true}, {"c": "git push --force-with-lease", "d": "Sube el historial reescrito si esos commits ya estaban en GitHub", "w": true}], "notes": ["Ejemplo: quiero cambiar el mensaje de «Version 2». Uso el ID del commit anterior (Version 1):", "    504a79f Version 3", "    53d6cff Version 2   ← quiero modificar este", "    9223912 Version 1", "    git rebase -i 9223912", "Git abre un editor con la lista. Cambia pick por reword en el commit que quieras modificar:", "    reword 53d6cff Version 2", "    pick 504a79f Version 3", "Guarda y cierra. Git abre otro editor para escribir el nuevo mensaje. Al terminar, el historial queda reescrito.", "Aviso: reescribir commits que ya están en GitHub puede afectar a otros colaboradores. Hazlo solo en repositorios personales."]}, {"id": "ignorar", "title": "Ignorar archivos", "tag": "", "rows": [{"c": "echo \"__pycache__/\" >> .gitignore", "d": "Añade una regla al .gitignore para no subir esa carpeta", "w": false}, {"c": "git status --ignored", "d": "Muestra también los archivos ignorados", "w": false}], "notes": ["Reglas útiles para Python en .gitignore: __pycache__/  *.pyc  .env  .venv/", "Nunca subas claves ni datos privados: .env, claves SSH (id_ed25519), cookies, .claude.json."]}, {"id": "terminal", "title": "Terminal básica (apoyo)", "tag": "", "rows": [{"c": "pwd", "d": "Muestra en qué carpeta estás", "w": false}, {"c": "ls", "d": "Lista los archivos de la carpeta", "w": false}, {"c": "cd ~/Documents/IA-PROGRAM", "d": "Entra en la carpeta del proyecto", "w": false}, {"c": "mkdir -p ~/Documents/IA-PROGRAM", "d": "Crea la carpeta (y las intermedias si no existen)", "w": false}, {"c": "nano archivo.py", "d": "Edita un archivo en la terminal. Ctrl+O guarda, Ctrl+X sale, Y confirma", "w": false}, {"c": "python3 archivo.py", "d": "Ejecuta un programa de Python", "w": false}, {"c": "code archivo.py", "d": "Abre el archivo en VS Code", "w": false}], "notes": ["En Git Bash de Windows, si python no se reconoce, usa la ruta completa: /c/Users/TU_USUARIO/miniforge3/python.exe archivo.py"]}], "errors": [{"err": "error: remote origin already exists.", "why": "Ya hay un remoto llamado origin, quizá con una URL de ejemplo o equivocada.", "fix": ["git remote -v", "git remote set-url origin https://github.com/RUBENGARCE/IA-PROGRAM.git"]}, {"err": "error: src refspec main does not match any", "why": "La rama main todavía no tiene ningún commit, así que no hay nada que subir.", "fix": ["git add .", "git commit -m \"Primer commit\"", "git push -u origin main"]}, {"err": "fatal: pathspec 'mi_script.py' did not match any files", "why": "El nombre del archivo no existe o está mal escrito (por ejemplo, copiaste el nombre de un ejemplo).", "fix": ["git status"]}, {"err": "nothing to commit / Everything up-to-date", "why": "No hay cambios nuevos desde el último commit y el último push. No es un fallo.", "fix": []}, {"err": "Git está tomando toda tu carpeta personal (warnings de Permission denied y cientos de archivos)", "why": "Ejecutaste git init o git add . estando en ~ y no en la carpeta del proyecto.", "fix": ["cd ~", "rm -rf .git", "cd ~/Documents/IA-PROGRAM", "pwd"], "note": "El rm -rf .git de ~ solo borra el repositorio de Git, no tus archivos. Antes de cualquier git add, comprueba con pwd dónde estás."}, {"err": "warning: LF will be replaced by CRLF", "why": "Aviso normal en Windows por los saltos de línea. No hace falta hacer nada.", "fix": []}, {"err": "El push es rechazado porque el repositorio de GitHub ya tiene contenido", "why": "Creaste el repositorio en GitHub con un README o licencia y tu historial local es distinto.", "fix": ["git pull origin main --allow-unrelated-histories", "git push"]}, {"err": "GitHub pide contraseña y la rechaza", "why": "GitHub ya no acepta la contraseña de la cuenta desde la terminal.", "fix": ["gh auth login"]}]};
+
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+
+// Copiar: portapapeles si se puede; si no, se selecciona el texto
+function copyText(text, btn, codeEl) {
+  const done = () => {
+    const old = btn.textContent;
+    btn.textContent = "Copiado";
+    btn.classList.add("ok");
+    setTimeout(() => { btn.textContent = "Copiar"; btn.classList.remove("ok"); }, 1300);
+  };
+  const fallback = () => {
+    try {
+      const r = document.createRange();
+      r.selectNodeContents(codeEl);
+      const s = window.getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+      btn.textContent = "Selecciona";
+      setTimeout(() => { btn.textContent = "Copiar"; }, 1500);
+    } catch (e) {}
+  };
+  try {
+    navigator.clipboard.writeText(text).then(done, fallback);
+  } catch (e) { fallback(); }
+}
+
+function cmdBlock(text) {
+  const wrap = el("div", "cmd");
+  const code = el("code", "c", text);
+  const btn = el("button", "copy", "Copiar");
+  btn.type = "button";
+  btn.setAttribute("aria-label", "Copiar: " + text);
+  btn.addEventListener("click", () => copyText(text, btn, code));
+  wrap.append(code, btn);
+  return wrap;
+}
+
+// Título y contador
+document.getElementById("t").textContent = D.title;
+document.getElementById("sub").textContent = D.subtitle;
+const totalCmds = D.sections.reduce((a, s) => a + s.rows.length, 0);
+document.getElementById("count").textContent =
+  totalCmds + " comandos · " + D.sections.length + " categorías · " + D.errors.length + " errores resueltos";
+
+const main = document.getElementById("main");
+const nav = document.getElementById("nav");
+const sectionEls = [];
+
+function addSection(id, titleText, num, tag, warnTag) {
+  const s = el("section");
+  s.id = id;
+  const h = el("h2");
+  if (num) h.append(el("span", "num", num));
+  h.append(document.createTextNode(titleText));
+  if (tag) h.append(el("span", warnTag ? "chip warn" : "chip", tag));
+  s.append(h);
+  main.append(s);
+  sectionEls.push(s);
+  const a = el("a", null, titleText);
+  a.href = "#" + id;
+  a.dataset.target = id;
+  nav.append(a);
+  return s;
+}
+
+// Flujo de cada día
+{
+  const s = addSection("flujo", "Flujo de cada día", "", "Lo más usado", false);
+  const ol = el("ol", "flow");
+  D.flow.forEach((f, i) => {
+    const li = el("li", "step");
+    li.dataset.s = (f[0] + " " + f[1]).toLowerCase();
+    li.append(el("span", "n", "Paso " + (i + 1)));
+    li.append(cmdBlock(f[0]));
+    li.append(el("span", "what", f[1]));
+    ol.append(li);
+  });
+  s.append(ol);
+  const c = el("div", "callout", D.flowNote);
+  s.append(c);
+}
+
+// Conceptos
+{
+  const s = addSection("conceptos", "Conceptos clave", "", "", false);
+  const dl = el("dl", "terms");
+  D.concepts.forEach(([t, x]) => {
+    const d = el("div", "term");
+    d.dataset.s = (t + " " + x).toLowerCase();
+    d.append(el("dt", null, t), el("dd", null, x));
+    dl.append(d);
+  });
+  s.append(dl);
+}
+
+// Categorías
+D.sections.forEach((sec, i) => {
+  const s = addSection(sec.id, sec.title, String(i + 1).padStart(2, "0"), sec.tag, false);
+  const rows = el("div", "rows");
+  sec.rows.forEach(r => {
+    const row = el("div", "row");
+    row.dataset.s = (r.c + " " + r.d).toLowerCase();
+    row.append(cmdBlock(r.c));
+    const d = el("p", "desc", r.d);
+    if (r.w) d.append(el("span", "chip warn", "Cuidado"));
+    row.append(d);
+    rows.append(row);
+  });
+  s.append(rows);
+  if (sec.notes && sec.notes.length) {
+    const box = el("div", "notes");
+    let pre = null;
+    sec.notes.forEach(n => {
+      if (n.startsWith("    ")) {
+        if (!pre) { pre = el("pre"); box.append(pre); pre.textContent = n.slice(4); }
+        else pre.textContent += "\n" + n.slice(4);
+      } else {
+        pre = null;
+        box.append(el("p", null, n));
+      }
+    });
+    box.dataset.keep = "1";
+    s.append(box);
+  }
+});
+
+// Errores
+{
+  const s = addSection("errores", "Errores frecuentes y cómo solucionarlos", String(D.sections.length + 1).padStart(2, "0"), "", false);
+  const list = el("div", "errs");
+  D.errors.forEach(e => {
+    const it = el("div", "err");
+    it.dataset.s = (e.err + " " + e.why + " " + (e.fix || []).join(" ")).toLowerCase();
+    it.append(el("div", "e", e.err));
+    it.append(el("p", "why", e.why));
+    if (e.fix && e.fix.length) {
+      const f = el("div", "fixes");
+      e.fix.forEach(c => f.append(cmdBlock(c)));
+      it.append(f);
+    } else {
+      it.append(el("div", "none", "No hay que hacer nada: es normal."));
+    }
+    if (e.note) it.append(el("p", "nota", e.note));
+    list.append(it);
+  });
+  s.append(list);
+}
+
+const empty = el("div", "empty", "No hay resultados. Prueba con otra palabra.");
+empty.hidden = true;
+main.append(empty);
+
+// Buscador
+const q = document.getElementById("q");
+function filter() {
+  const t = q.value.trim().toLowerCase();
+  let any = false;
+  sectionEls.forEach(sec => {
+    const items = sec.querySelectorAll("[data-s]");
+    let shown = 0;
+    items.forEach(it => {
+      const ok = !t || it.dataset.s.includes(t);
+      it.hidden = !ok;
+      if (ok) shown++;
+    });
+    const notes = sec.querySelector("[data-keep]");
+    if (notes) notes.hidden = !!t;
+    sec.hidden = !!t && shown === 0;
+    if (!sec.hidden) any = true;
+    const link = nav.querySelector('[data-target="' + sec.id + '"]');
+    if (link) link.hidden = sec.hidden;
+  });
+  empty.hidden = any;
+}
+q.addEventListener("input", filter);
+
+// Índice: salto suave y sección activa
+const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+nav.addEventListener("click", ev => {
+  const a = ev.target.closest("a");
+  if (!a) return;
+  ev.preventDefault();
+  const sec = document.getElementById(a.dataset.target);
+  if (sec) sec.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+});
+if ("IntersectionObserver" in window) {
+  const links = Array.from(nav.querySelectorAll("a"));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        links.forEach(l => l.removeAttribute("aria-current"));
+        const l = nav.querySelector('[data-target="' + en.target.id + '"]');
+        if (l) l.setAttribute("aria-current", "true");
+      }
+    });
+  }, { rootMargin: "-80px 0px -65% 0px" });
+  sectionEls.forEach(s => io.observe(s));
+}
+</script>
+
+</body></html>
